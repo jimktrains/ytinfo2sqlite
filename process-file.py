@@ -20,7 +20,7 @@ class BaseSQL:
             values.append(v)
         insertfields = ",".join(keys)
         insertplaceholders = ','.join(['?' for v in values])
-        return (f"insert into {type(self).__name__} ({insertfields}) values ({insertplaceholders})",
+        return (f"insert or ignore into {type(self).__name__} ({insertfields}) values ({insertplaceholders})",
                 values
                 )
 
@@ -155,7 +155,7 @@ class ytvideotag(BaseSQL):
   def from_json(j):
     i = j['id']
     tags = []
-    for  t in j.get('tags', []):
+    for  tag in j.get('tags', []):
         tags.append(ytvideotag(video_id=1, tag=tag))
     return tags
 
@@ -183,7 +183,7 @@ if file_ext == '.mkv':
         print("Not attachment with a name of 'info.json' was found")
         exit(0)
 
-    result = subprocess.run(['mkvextract', '--redirect-output', '/dev/null', args.videojsonfilename, 'attachment', f"{a.get('id')}:/dev/stdout"], stdout=subprocess.PIPE)
+    result = subprocess.run(['mkvextract', '--redirect-output', '/dev/null', args.videojsonfilename, 'attachments', f"{a.get('id')}:/dev/stdout"], stdout=subprocess.PIPE)
     if result.returncode != 0:
         print(result)
         exit(result.returncode)
